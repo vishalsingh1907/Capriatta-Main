@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Clubs | Capriatta</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- SheetJS Excel library (for My Clubs XLSX export) -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        @keyframes bellRing {
+            0% { transform: rotate(0deg); }
+            10% { transform: rotate(15deg); }
+            20% { transform: rotate(-15deg); }
+            30% { transform: rotate(10deg); }
+            40% { transform: rotate(-10deg); }
+            50% { transform: rotate(0deg); }
+        }
+        .bell-ring {
+            animation: bellRing 1s ease-in-out;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 min-h-screen">
+
+    <!-- Header/Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Left: Title -->
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-users text-indigo-600 text-2xl"></i>
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                        Browse Clubs
+                    </h1>
+                </div>
+
+                <!-- Right: Actions -->
+                <div id="nav-actions" class="flex items-center space-x-2 sm:space-x-3">
+                    <!-- Notifications (small pill on mobile) -->
+                    <a href="notifications.html"
+                       id="notification-btn"
+                       class="relative flex items-center justify-center sm:justify-between
+                              space-x-0 sm:space-x-2
+                              px-3 py-2 sm:px-4 sm:py-2
+                              bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg
+                              hover:shadow-lg transform hover:scale-105 transition-all text-xs sm:text-sm">
+                        <i class="fas fa-bell text-sm sm:text-lg bell-ring"></i>
+                        <span class="font-medium hidden sm:inline">Notifications</span>
+                        <span id="nav-notification-badge"
+                              class="hidden notification-badge bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full pulse">
+                            0
+                        </span>
+                    </a>
+
+                    <!-- My Clubs (Excel download button - injected by JS) -->
+                    <button id="download-clubs-btn"
+                            class="relative flex items-center justify-center sm:justify-between
+                                   space-x-0 sm:space-x-2
+                                   px-3 py-2 sm:px-4 sm:py-2
+                                   bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg
+                                   hover:shadow-lg transform hover:scale-105 transition-all text-xs sm:text-sm"
+                            title="Download My Clubs as Excel">
+                        <i class="fas fa-file-excel text-sm sm:text-lg"></i>
+                        <span class="font-medium hidden sm:inline">My Clubs</span>
+                        <span id="my-clubs-count" class="hidden notification-badge bg-blue-700 text-white text-[10px] font-bold px-1 py-0.5 rounded-full">0</span>
+                    </button>
+
+                    <!-- Create Club (small pill on mobile) -->
+                    <a href="create-club.html?type=club"
+                       class="flex items-center justify-center sm:justify-between
+                              space-x-0 sm:space-x-2
+                              px-3 py-2 sm:px-4 sm:py-2
+                              bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg
+                              hover:shadow-lg transform hover:scale-105 transition-all text-xs sm:text-sm"
+                       title="Create a new club">
+                        <i class="fas fa-plus text-sm sm:text-lg"></i>
+                        <span class="font-medium hidden sm:inline">Create Club</span>
+                    </a>
+
+                    <!-- Dashboard (icon only on mobile) -->
+                    <a href="dashboard.html"
+                       class="flex items-center space-x-1 sm:space-x-2
+                              text-gray-600 hover:text-indigo-600 transition-colors text-xs sm:text-sm"
+                       title="Back to Dashboard">
+                        <i class="fas fa-arrow-left text-sm sm:text-base"></i>
+                        <span class="font-medium hidden sm:inline">Dashboard</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Search and Filter Section -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Search Input -->
+                <div class="relative">
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input 
+                        type="text" 
+                        id="search-input"
+                        placeholder="Search clubs by name, college, mission..."
+                        class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    >
+                </div>
+
+                <!-- Filter Dropdown -->
+                <div class="relative">
+                    <i class="fas fa-filter absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <select 
+                        id="filter-type"
+                        class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all appearance-none bg-white cursor-pointer"
+                    >
+                        <option value="all">All Club Types</option>
+                        <option value="Official Club">Official Clubs</option>
+                        <option value="Community">Community Clubs</option>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="text-center py-20">
+            <div class="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-600"></div>
+            <p class="mt-4 text-gray-600 font-medium">Loading clubs...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" style="display: none;">
+            <div class="bg-gradient-to-br from-indigo-100 to-purple-100 rounded-3xl shadow-xl p-12 text-center max-w-2xl mx-auto">
+                <div class="mb-6">
+                    <div class="inline-flex items-center justify-center w-24 h-24 bg-white rounded-full shadow-lg">
+                        <i class="fas fa-users-cog text-5xl text-indigo-600"></i>
+                    </div>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Start a Community!</h2>
+                <p class="text-lg text-gray-700 mb-3">No clubs have been created yet.</p>
+                <p class="text-gray-600 mb-8">
+                    Be a leader! Create the first club and bring people together around shared interests and passions.
+                </p>
+
+                <div class="bg-white rounded-2xl p-6 mb-8 text-left max-w-md mx-auto">
+                    <h3 class="font-semibold text-gray-800 mb-4 text-center">Why Create a Club?</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <span class="text-gray-700">Build a community around your passion</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <span class="text-gray-700">Organize events and activities</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <span class="text-gray-700">Connect with like-minded people</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <span class="text-gray-700">Develop leadership skills</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <a href="create-club.html?type=club"
+                   class="inline-flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-bold text-lg hover:shadow-2xl transform hover:scale-105 transition-all">
+                    <i class="fas fa-plus-circle text-2xl"></i>
+                    <span>Create Your First Club</span>
+                </a>
+
+                <p class="mt-6 text-sm text-gray-600">
+                    Start building your community today! 🎯
+                </p>
+            </div>
+        </div>
+
+        <!-- Clubs Grid -->
+        <div id="clubs-grid" style="display: none;" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Clubs will be dynamically inserted here -->
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <p class="text-gray-600 text-sm">© 2025 Capriatta. All rights reserved.</p>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-600 hover:text-indigo-600 transition-colors">
+                        <i class="fab fa-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-600 hover:text-indigo-600 transition-colors">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-600 hover:text-indigo-600 transition-colors">
+                        <i class="fab fa-linkedin text-xl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JS -->
+    <script type="module" src="js/browse-clubs.js"></script>
+    <script type="module" src="js/notification-badge.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Projects | Capriatta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 min-h-screen">
+
+    <!-- Header/Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-project-diagram text-purple-600 text-2xl"></i>
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                        Browse Projects
+                    </h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="create.html?type=project" class="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transform hover:scale-105 transition-all">
+                        <i class="fas fa-plus"></i>
+                        <span class="font-medium">Create Project</span>
+                    </a>
+                    <a href="dashboard.html" class="flex items-center space-x-2 text-gray-600 hover:text-purple-600 transition-colors">
+                        <i class="fas fa-arrow-left"></i>
+                        <span class="font-medium">Dashboard</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Search and Filter Section -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Search Input -->
+                <div class="relative">
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input 
+                        type="text" 
+                        id="search-input"
+                        placeholder="Search projects by title, creator, requirements..."
+                        class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    >
+                </div>
+
+                <!-- Filter Dropdown -->
+                <div class="relative">
+                    <i class="fas fa-graduation-cap absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <select 
+                        id="filter-course"
+                        class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all appearance-none bg-white cursor-pointer"
+                    >
+                        <option value="all">All Courses</option>
+                        <option value="B.Tech CSE">B.Tech CSE</option>
+                        <option value="B.Tech ECE">B.Tech ECE</option>
+                        <option value="B.Tech ME">B.Tech ME</option>
+                        <option value="B.Tech EE">B.Tech EE</option>
+                        <option value="BCA">BCA</option>
+                        <option value="MCA">MCA</option>
+                        <option value="MBA">MBA</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Indicator - Shows by default -->
+        <div id="loading-indicator" class="text-center py-20">
+            <div class="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-600"></div>
+            <p class="mt-4 text-gray-600 font-medium">Loading projects...</p>
+        </div>
+
+        <!-- Empty State - Beautiful User-Friendly Design -->
+        <div id="empty-state" style="display: none;">
+            <div class="bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl shadow-xl p-12 text-center max-w-2xl mx-auto">
+                <!-- Icon -->
+                <div class="mb-6">
+                    <div class="inline-flex items-center justify-center w-24 h-24 bg-white rounded-full shadow-lg">
+                        <i class="fas fa-rocket text-5xl text-purple-600"></i>
+                    </div>
+                </div>
+
+                <!-- Heading -->
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">
+                    Be the First to Start!
+                </h2>
+
+                <!-- Description -->
+                <p class="text-lg text-gray-700 mb-3">
+                    No projects have been created yet. 
+                </p>
+                <p class="text-gray-600 mb-8">
+                    Share your amazing project ideas with the community and find teammates who share your passion!
+                </p>
+
+                <!-- Benefits List -->
+                <div class="bg-white rounded-2xl p-6 mb-8 text-left max-w-md mx-auto">
+                    <h3 class="font-semibold text-gray-800 mb-4 text-center">Why Create a Project?</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <span class="text-gray-700">Find talented teammates for your ideas</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <span class="text-gray-700">Collaborate on exciting projects</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <span class="text-gray-700">Build your portfolio together</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-1 mr-3"></i>
+                            <span class="text-gray-700">Learn and grow as a team</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- CTA Button -->
+                <a href="create.html?type=project" class="inline-flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg hover:shadow-2xl transform hover:scale-105 transition-all">
+                    <i class="fas fa-plus-circle text-2xl"></i>
+                    <span>Create Your First Project</span>
+                </a>
+
+                <!-- Secondary Text -->
+                <p class="mt-6 text-sm text-gray-600">
+                    It only takes 2 minutes to get started! 🚀
+                </p>
+            </div>
+        </div>
+
+        <!-- Projects Grid - Hidden by default -->
+        <div id="projects-grid" style="display: none;" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Projects will be dynamically inserted here -->
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <p class="text-gray-600 text-sm">© 2025 Capriatta. All rights reserved.</p>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-600 hover:text-purple-600 transition-colors">
+                        <i class="fab fa-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-600 hover:text-purple-600 transition-colors">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-600 hover:text-purple-600 transition-colors">
+                        <i class="fab fa-linkedin text-xl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Load JavaScript Module -->
+    <script type="module" src="js/browse-projects.js"></script>
+
+
+</body>
+</html>
